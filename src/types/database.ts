@@ -19,6 +19,7 @@ export interface Photo {
   user_tag_id?: string | null;
   b2_file_key: string;
   public_url: string;
+  optimized_url?: string;
   width: number;
   height: number;
 }

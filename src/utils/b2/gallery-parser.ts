@@ -126,12 +126,15 @@ export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[
               }
             }
             
+            const originalUrl = `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${obj.Key}`;
+            
             photos.push({
               id: obj.Key, // Using the full key as ID
               gallery_id: galleryName,
               user_tag_id: userHandle, // This would map to a user in your DB
               b2_file_key: obj.Key,
-              public_url: `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${obj.Key}`, // Using configured B2 public URL
+              public_url: originalUrl, // Original resolution
+              optimized_url: originalUrl, // For now, same as original - in production, this would be a CDN or service URL
               width,
               height,
             });

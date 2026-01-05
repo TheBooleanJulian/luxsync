@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ResponsiveMasonry } from 'react-responsive-masonry';
+import Image from 'next/image';
 import { Photo } from '@/types/database';
 
 interface MasonryGalleryProps {
@@ -40,11 +41,14 @@ const MasonryGallery: React.FC<MasonryGalleryProps> = ({ photos, onPhotoClick })
                 className="relative overflow-hidden bg-gray-100"
                 style={{ aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : '2/3' }}
               >
-                <img
-                  src={photo.public_url}
+                <Image
+                  src={photo.optimized_url || photo.public_url}
                   alt={`Gallery photo ${photo.id}`}
                   className="h-full w-full object-cover"
                   loading="lazy"
+                  width={photo.width || 600}
+                  height={photo.height || 800}
+                  style={{ objectFit: 'cover' }}
                 />
               </div>
             </div>
