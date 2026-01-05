@@ -11,8 +11,8 @@ export const createB2Client = () => {
     throw new Error('B2_ENDPOINT must be set in environment variables');
   }
   
-  return new S3Client({
-    region: process.env.B2_REGION || 'us-west-004', // Default B2 region, change as needed
+  const client = new S3Client({
+    region: process.env.B2_REGION || 'eu-central-003', // Using your actual region
     endpoint: process.env.B2_ENDPOINT!, // e.g., 'https://s3.us-west-004.backblazeb2.com'
     credentials: {
       accessKeyId: process.env.B2_APPLICATION_KEY_ID!,
@@ -20,6 +20,8 @@ export const createB2Client = () => {
     },
     forcePathStyle: true, // Required for B2
   });
+  
+  return client;
 };
 
 export default createB2Client;
