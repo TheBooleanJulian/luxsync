@@ -17,7 +17,15 @@ A Next.js-based photo gallery platform that integrates with Supabase for databas
 - Automatic parsing of folder structures ([YYYY-MM-DD] [Project Title] and [User Handle] subfolders)
 - Supabase integration for user and gallery management
 - Backblaze B2 integration for image storage
-- Single-button download functionality
+- Full-screen photo viewer with zoom and navigation
+- Single-button download functionality for individual photos
+- Gallery download as ZIP archive
+- Gallery headers with date and title extraction
+- Photo dimensions fetched from B2 metadata
+- Portrait orientation (3:2 aspect ratio) by default
+- Responsive design with multiple column layout based on screen size
+- Error handling and loading states
+- Keyboard navigation support (Escape key to close modal)
 
 ## Database Schema
 
@@ -77,20 +85,33 @@ The application will be available at http://localhost:3000
 ```
 src/
 ├── app/                    # Next.js app router pages
-├── components/            # Reusable React components
-│   └── MasonryGallery.tsx # Responsive masonry grid component
-├── types/                 # TypeScript type definitions
-│   └── database.ts        # Database schema type definitions
-└── utils/                 # Utility functions
-    └── supabase/
-        └── server.ts      # Supabase server-side client
+│   ├── api/                # API routes
+│   │   ├── galleries/      # Gallery-related API endpoints
+│   │   │   └── download/[galleryId]/route.ts  # Gallery ZIP download
+│   │   └── photos/         # Photo-related API endpoints
+│   │       └── gallery/[galleryId]/route.ts   # Fetch photos by gallery
+├── components/             # Reusable React components
+│   ├── MasonryGallery.tsx  # Responsive masonry grid component
+│   └── modal/              # Modal components
+│       └── PhotoModal.tsx  # Full-screen photo viewer
+├── types/                  # TypeScript type definitions
+│   └── database.ts         # Database schema type definitions
+└── utils/                  # Utility functions
+    ├── b2/                 # Backblaze B2 utilities
+    │   ├── client.ts       # B2 client configuration
+    │   ├── gallery-parser.ts  # Parse gallery structure from B2
+    │   └── service.ts      # B2 service with upload/download operations
+    └── supabase/           # Supabase utilities
+        └── server.ts       # Supabase server-side client
 ```
 
 ## Key Components
 
 - **MasonryGallery**: Responsive masonry grid component that displays photos with preserved aspect ratios
+- **PhotoModal**: Full-screen photo viewer with download and navigation capabilities
 - **Supabase Client**: Server-side Supabase client for database operations
 - **Database Types**: TypeScript interfaces matching the Supabase schema
 - **B2 Storage Service**: Backblaze B2 integration for photo storage with S3-compatible API
-- **Image Processing**: Utilities for extracting image dimensions and validating file types
-- **Photo Upload API**: API routes for handling photo uploads to B2 and metadata storage in Supabase
+- **Gallery Parser**: Parses folder structure to extract gallery information and photo metadata
+- **Image Processing**: Utilities for extracting image dimensions from B2 metadata
+- **API Routes**: Server-side endpoints for fetching galleries and photos, and downloading galleries as ZIP archives
