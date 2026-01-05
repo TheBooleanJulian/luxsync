@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { getPhotosForGallery } from '@/utils/b2/gallery-parser';
+import { getPhotosByGallery } from '@/utils/supabase/server';
+import { getGalleryByFolderName } from '@/utils/supabase/server';
 
 export async function GET(
   request: NextRequest,
@@ -15,7 +16,11 @@ export async function GET(
       );
     }
 
-    const photos = await getPhotosForGallery(galleryId);
+    // First, get the gallery from the database to get its ID
+    const gallery = await getGalleryByFolderName(galleryId);
+    
+    // Then get photos for that gallery
+    const photos = await getPhotosByGallery(gallery.id);
     
     return Response.json({ photos });
   } catch (error) {

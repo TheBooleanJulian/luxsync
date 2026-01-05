@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import MasonryGallery from '@/components/MasonryGallery';
 import PhotoModal from '@/components/modal/PhotoModal';
 import { Photo } from '@/types/database';
-import { getPhotosForGallery } from '@/utils/b2/gallery-parser';
+import { getGalleries, getPhotosByGallery } from '@/utils/supabase/server';
 
 export default function Home() {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -16,44 +16,34 @@ export default function Home() {
   useEffect(() => {
     const fetchGalleriesAndPhotos = async () => {
       try {
-        // First, get the list of galleries via API route
-        const response = await fetch('/api/galleries');
-        const data = await response.json();
+        // First, get the list of galleries from the database
+        const galleries = await getGalleries();
         
-        if (data.galleries && data.galleries.length > 0) {
-          // Get photos for the first gallery via API route
-          const firstGallery = data.galleries[0];
+        if (galleries && galleries.length > 0) {
+          // Get photos for the first gallery from the database
+          const firstGallery = galleries[0];
           
-          // Extract gallery title and date
-          const dateMatch = firstGallery.folderName.match(/^([0-9]{4}-[0-9]{2}-[0-9]{2})\s+(.+)$/);
-          if (dateMatch) {
-            setCurrentGallery({
-              date: dateMatch[1],
-              title: dateMatch[2].trim(),
-              folderName: firstGallery.folderName
-            });
-          } else {
-            setCurrentGallery({
-              date: new Date().toISOString().split('T')[0],
-              title: firstGallery.folderName,
-              folderName: firstGallery.folderName
-            });
-          }
+          // Set gallery information
+          setCurrentGallery({
+            date: firstGallery.event_date,
+            title: firstGallery.title,
+            folderName: firstGallery.folder_name
+          });
           
-          const photosResponse = await fetch(`/api/photos/gallery/${encodeURIComponent(firstGallery.folderName)}`);
-          const photosData = await photosResponse.json();
+          // Get photos for this gallery
+          const photos = await getPhotosByGallery(firstGallery.id);
           
-          if (photosData.photos) {
-            setPhotos(photosData.photos);
+          if (photos) {
+            setPhotos(photos);
           } else {
             setError('No photos found in the selected gallery');
           }
         } else {
-          setError('No galleries found in B2 storage');
+          setError('No galleries found in database');
         }
       } catch (err: any) {
         console.error('Error fetching galleries or photos:', err);
-        setError(`Failed to load galleries or photos from B2 storage: ${err.message || err}`);
+        setError(`Failed to load galleries or photos from database: ${err.message || err}`);
       } finally {
         setLoading(false);
       }

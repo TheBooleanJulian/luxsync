@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
-import { getGalleriesFromB2 } from '@/utils/b2/gallery-parser';
+import { getGalleries } from '@/utils/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const galleries = await getGalleriesFromB2();
+    const galleries = await getGalleries();
 
     return Response.json({
       galleries,
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error in galleries API:', error);
     return Response.json(
-      { error: 'Failed to retrieve galleries from B2 storage' },
+      { error: 'Failed to retrieve galleries from database' },
       { status: 500 }
     );
   }
