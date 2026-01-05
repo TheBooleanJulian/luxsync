@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LuxSync - Client Photo Gallery Platform
 
-## Getting Started
+A Next.js-based photo gallery platform that integrates with Supabase for database management and Backblaze B2 for image storage.
 
-First, run the development server:
+## Tech Stack
 
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
+- **Animations**: Framer Motion
+- **Layout**: react-responsive-masonry
+- **Backend/DB**: Supabase (PostgreSQL), Supabase Auth
+- **Storage**: Backblaze B2 (S3-compatible)
+- **Infrastructure**: Vercel (Frontend Hosting)
+
+## Features
+
+- Responsive masonry grid layout for photo galleries
+- Automatic parsing of folder structures ([YYYY-MM-DD] [Project Title] and [User Handle] subfolders)
+- Supabase integration for user and gallery management
+- Backblaze B2 integration for image storage
+- Single-button download functionality
+
+## Database Schema
+
+### users
+- id (string)
+- handle (string)
+- display_name (string)
+- instagram (string, optional)
+
+### galleries
+- id (string)
+- title (string)
+- event_date (string)
+- folder_name (string)
+- cover_image_url (string)
+
+### photos
+- id (string)
+- gallery_id (string)
+- user_tag_id (string, nullable)
+- b2_file_key (string)
+- public_url (string)
+- width (number)
+- height (number)
+
+## Setup
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Create a `.env.local` file with your Supabase credentials:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The application will be available at http://localhost:3000
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/                    # Next.js app router pages
+├── components/            # Reusable React components
+│   └── MasonryGallery.tsx # Responsive masonry grid component
+├── types/                 # TypeScript type definitions
+│   └── database.ts        # Database schema type definitions
+└── utils/                 # Utility functions
+    └── supabase/
+        └── server.ts      # Supabase server-side client
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Key Components
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **MasonryGallery**: Responsive masonry grid component that displays photos with preserved aspect ratios
+- **Supabase Client**: Server-side Supabase client for database operations
+- **Database Types**: TypeScript interfaces matching the Supabase schema
