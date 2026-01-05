@@ -197,6 +197,8 @@ export class B2Service {
    */
   async listObjects(prefix: string = '', maxKeys: number = 1000) {
     try {
+      console.log('Listing objects with parameters:', { bucket: B2_BUCKET_NAME, prefix: `${B2_BASE_PATH}/${prefix}`, maxKeys });
+      
       const { ListObjectsV2Command } = await import("@aws-sdk/client-s3");
       
       const command = new ListObjectsV2Command({
@@ -207,6 +209,8 @@ export class B2Service {
 
       const response = await this.client.send(command);
       
+      console.log('Successfully listed objects:', response.Contents?.length || 0, 'objects found');
+      
       return {
         objects: response.Contents || [],
         isTruncated: response.IsTruncated || false,
@@ -214,6 +218,8 @@ export class B2Service {
       };
     } catch (error) {
       console.error('Error listing objects from B2:', error);
+      console.error('Bucket:', B2_BUCKET_NAME);
+      console.error('Prefix:', `${B2_BASE_PATH}/${prefix}`);
       throw error;
     }
   }

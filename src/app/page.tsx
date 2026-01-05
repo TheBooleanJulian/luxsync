@@ -11,21 +11,29 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPhotos = async () => {
+    const fetchGalleriesAndPhotos = async () => {
       try {
-        // For now, fetch from a default gallery
-        // In a real implementation, you might want to allow users to select which gallery to view
-        const galleryPhotos = await getPhotosForGallery('2026-01-05 Miku Expo'); // Default gallery name
-        setPhotos(galleryPhotos);
-      } catch (err) {
-        console.error('Error fetching photos:', err);
-        setError('Failed to load photos from B2 storage');
+        // First, get the list of galleries
+        const response = await fetch('/api/galleries');
+        const data = await response.json();
+        
+        if (data.galleries && data.galleries.length > 0) {
+          // Use the first gallery in the list
+          const firstGallery = data.galleries[0];
+          const galleryPhotos = await getPhotosForGallery(firstGallery.folderName);
+          setPhotos(galleryPhotos);
+        } else {
+          setError('No galleries found in B2 storage');
+        }
+      } catch (err: any) {
+        console.error('Error fetching galleries or photos:', err);
+        setError(`Failed to load galleries or photos from B2 storage: ${err.message || err}`);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPhotos();
+    fetchGalleriesAndPhotos();
   }, []);
 
   const handlePhotoClick = (photo: Photo) => {

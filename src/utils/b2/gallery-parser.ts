@@ -14,6 +14,11 @@ export interface GalleryFolder {
  */
 export async function getGalleriesFromB2(): Promise<GalleryFolder[]> {
   try {
+    console.log('Attempting to fetch galleries from B2');
+    console.log('B2_PUBLIC_URL:', process.env.B2_PUBLIC_URL);
+    console.log('B2_BUCKET_NAME:', process.env.B2_BUCKET_NAME);
+    console.log('B2_BASE_PATH:', process.env.B2_BASE_PATH);
+    
     // List all objects in the base path
     const result = await b2Service.listObjects('', 1000);
     
@@ -72,6 +77,11 @@ export async function getGalleriesFromB2(): Promise<GalleryFolder[]> {
  */
 export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[]> {
   try {
+    console.log('Attempting to fetch photos for gallery:', galleryFolder);
+    console.log('B2_PUBLIC_URL:', process.env.B2_PUBLIC_URL);
+    console.log('B2_BUCKET_NAME:', process.env.B2_BUCKET_NAME);
+    console.log('B2_BASE_PATH:', process.env.B2_BASE_PATH);
+    
     // List all objects in the specific gallery folder
     const result = await b2Service.listObjects(`${galleryFolder}/`, 1000);
     
