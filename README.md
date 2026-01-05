@@ -58,7 +58,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 # Backblaze B2 Configuration
 B2_APPLICATION_KEY_ID=your_b2_application_key_id
 B2_APPLICATION_KEY=your_b2_application_key
-B2_BUCKET_NAME=your_bucket_name
+B2_BUCKET_NAME=hatsune-b2  # Your bucket name
+B2_BASE_PATH=B2 LuxSync  # Subfolder path in your bucket (optional, defaults to 'B2 LuxSync')
 B2_ENDPOINT=https://s3.us-west-004.backblazeb2.com  # Update with your B2 endpoint
 B2_REGION=us-west-004  # Update with your B2 region
 B2_PUBLIC_URL=https://fXXXXX.backblazeb2.com  # Your B2 public URL

@@ -8,6 +8,8 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const B2_BUCKET_NAME = process.env.B2_BUCKET_NAME!;
+const B2_BASE_PATH = process.env.B2_BASE_PATH || 'B2 LuxSync'; // Default subfolder path in your bucket
+
 
 export interface B2UploadResult {
   fileKey: string;
@@ -35,7 +37,8 @@ export class B2Service {
     contentType?: string
   ): Promise<B2UploadResult> {
     try {
-      const fileKey = folderPath ? `${folderPath}/${fileName}` : fileName;
+      const fullFolderPath = B2_BASE_PATH + (folderPath ? `/${folderPath}` : '');
+      const fileKey = `${fullFolderPath}/${fileName}`;
       
       const command = new PutObjectCommand({
         Bucket: B2_BUCKET_NAME,
