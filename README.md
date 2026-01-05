@@ -50,10 +50,18 @@ A Next.js-based photo gallery platform that integrates with Supabase for databas
 npm install
 ```
 
-2. Create a `.env.local` file with your Supabase credentials:
+2. Create a `.env.local` file with your Supabase and Backblaze B2 credentials:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Backblaze B2 Configuration
+B2_APPLICATION_KEY_ID=your_b2_application_key_id
+B2_APPLICATION_KEY=your_b2_application_key
+B2_BUCKET_NAME=your_bucket_name
+B2_ENDPOINT=https://s3.us-west-004.backblazeb2.com  # Update with your B2 endpoint
+B2_REGION=us-west-004  # Update with your B2 region
+B2_PUBLIC_URL=https://fXXXXX.backblazeb2.com  # Your B2 public URL
 ```
 
 3. Run the development server:
@@ -82,3 +90,6 @@ src/
 - **MasonryGallery**: Responsive masonry grid component that displays photos with preserved aspect ratios
 - **Supabase Client**: Server-side Supabase client for database operations
 - **Database Types**: TypeScript interfaces matching the Supabase schema
+- **B2 Storage Service**: Backblaze B2 integration for photo storage with S3-compatible API
+- **Image Processing**: Utilities for extracting image dimensions and validating file types
+- **Photo Upload API**: API routes for handling photo uploads to B2 and metadata storage in Supabase
