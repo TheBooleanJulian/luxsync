@@ -17,17 +17,18 @@ const MasonryGallery: React.FC<MasonryGalleryProps> = ({ photos, onPhotoClick })
         {photos.map((photo) => (
           <div
             key={photo.id}
-            className="cursor-pointer overflow-hidden rounded-lg shadow-lg"
+            className="cursor-pointer overflow-hidden rounded-lg shadow-lg transition-transform duration-300 hover:scale-[1.02]"
             onClick={() => onPhotoClick?.(photo)}
           >
             <div 
-              className="relative overflow-hidden"
+              className="relative overflow-hidden bg-gray-100"
               style={{ aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : '2/3' }}
             >
               <img
                 src={photo.public_url}
                 alt={`Gallery photo ${photo.id}`}
                 className="h-full w-full object-cover"
+                loading="lazy"
               />
             </div>
           </div>
