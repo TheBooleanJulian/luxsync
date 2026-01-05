@@ -101,14 +101,20 @@ export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[
           if (isImageFile(fileName)) {
             // For now, we'll set placeholder dimensions - in a real implementation
             // you might want to store dimensions in the file name or metadata
+            // In a real implementation, you might extract dimensions from the filename or metadata
+            // For example, if the filename contains dimensions like: image_800x600.jpg
+            const dimensionMatch = fileName.match(/_(\d+)x(\d+)\./);
+            const width = dimensionMatch ? parseInt(dimensionMatch[1]) : 800;
+            const height = dimensionMatch ? parseInt(dimensionMatch[2]) : 600;
+                    
             photos.push({
               id: obj.Key, // Using the full key as ID
               gallery_id: galleryName,
               user_tag_id: userHandle, // This would map to a user in your DB
               b2_file_key: obj.Key,
               public_url: `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${obj.Key}`, // Using configured B2 public URL
-              width: 0, // Actual dimensions would need to be stored or fetched
-              height: 0,
+              width,
+              height,
             });
           }
         }

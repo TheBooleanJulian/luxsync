@@ -20,14 +20,14 @@ const MasonryGallery: React.FC<MasonryGalleryProps> = ({ photos, onPhotoClick })
             className="cursor-pointer overflow-hidden rounded-lg shadow-lg"
             onClick={() => onPhotoClick?.(photo)}
           >
-            <div className="relative aspect-[4/3] overflow-hidden">
+            <div 
+              className="relative overflow-hidden"
+              style={{ aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : '4/3' }}
+            >
               <img
                 src={photo.public_url}
                 alt={`Gallery photo ${photo.id}`}
                 className="h-full w-full object-cover"
-                style={{
-                  aspectRatio: `${photo.width}/${photo.height}`,
-                }}
               />
             </div>
           </div>
