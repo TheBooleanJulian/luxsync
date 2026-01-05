@@ -104,8 +104,8 @@ export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[
             // In a real implementation, you might extract dimensions from the filename or metadata
             // For example, if the filename contains dimensions like: image_800x600.jpg
             const dimensionMatch = fileName.match(/_(\d+)x(\d+)\./);
-            const width = dimensionMatch ? parseInt(dimensionMatch[1]) : 800;
-            const height = dimensionMatch ? parseInt(dimensionMatch[2]) : 600;
+            const width = dimensionMatch ? parseInt(dimensionMatch[1]) : 600; // Default width for 3:2 portrait
+            const height = dimensionMatch ? parseInt(dimensionMatch[2]) : 900; // Default height for 3:2 portrait
                     
             photos.push({
               id: obj.Key, // Using the full key as ID

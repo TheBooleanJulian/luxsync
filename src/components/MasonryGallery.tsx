@@ -22,7 +22,7 @@ const MasonryGallery: React.FC<MasonryGalleryProps> = ({ photos, onPhotoClick })
           >
             <div 
               className="relative overflow-hidden"
-              style={{ aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : '4/3' }}
+              style={{ aspectRatio: photo.width && photo.height ? `${photo.width}/${photo.height}` : '2/3' }}
             >
               <img
                 src={photo.public_url}
