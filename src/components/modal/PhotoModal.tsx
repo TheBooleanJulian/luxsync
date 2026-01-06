@@ -90,7 +90,7 @@ const PhotoModal: React.FC<PhotoModalProps> = ({ photo, onClose, onDownload }) =
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6 pt-12">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between text-white">
             <div className="mb-2 sm:mb-0">
-              <h3 className="text-xl font-bold">{photo.id.split('/').pop()}</h3>
+              <h3 className="text-xl font-bold">{(photo.b2_file_key || photo.id).split('/').pop()}</h3>
               <p className="text-sm text-gray-300">Dimensions: {photo.width} x {photo.height}</p>
             </div>
             <div className="flex space-x-2">

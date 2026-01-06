@@ -88,6 +88,7 @@ export default function UserGalleryClient({ userId }: UserGalleryClientProps) {
         <h1 className="text-3xl font-bold mb-2">LuxSync Gallery</h1>
         <h2 className="text-2xl font-semibold text-gray-800">Photos for {userHandle}</h2>
         <p className="text-gray-600">User: {userHandle}</p>
+        <p className="text-gray-500 text-sm mt-1">User ID: {userHandle}</p>
         <div className="mt-4">
           <button
             onClick={handleDownloadGallery}

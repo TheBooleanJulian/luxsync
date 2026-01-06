@@ -33,7 +33,7 @@ const MasonryGallery: React.FC<MasonryGalleryProps> = ({ photos, onPhotoClick })
               >
                 <Image
                   src={photo.optimized_url || photo.public_url}
-                  alt={`Gallery photo ${photo.id}`}
+                  alt={`Gallery photo ${(photo.b2_file_key || photo.id).split('/').pop()}`}
                   className="h-full w-full object-cover"
                   loading="lazy"
                   width={photo.width || 600}

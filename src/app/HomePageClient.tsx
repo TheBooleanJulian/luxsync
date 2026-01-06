@@ -72,6 +72,7 @@ export default function HomePageClient({ initialPhotos, initialGallery, initialE
           <>
             <h2 className="text-2xl font-semibold text-gray-800">{currentGallery.title}</h2>
             <p className="text-gray-600">{currentGallery.event_date}</p>
+            <p className="text-gray-500 text-sm mt-1">Gallery ID: {currentGallery.folder_name}</p>
           </>
         )}
         <div className="mt-4">
