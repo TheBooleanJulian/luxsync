@@ -7,10 +7,14 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '*.backblazeb2.com', // Allow any backblaze subdomain
+        port: '',
+        pathname: '/**',
       },
       {
         protocol: 'http',
         hostname: '*.backblazeb2.com',
+        port: '',
+        pathname: '/**',
       },
     ],
   },

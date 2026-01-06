@@ -28,11 +28,10 @@ export async function getGalleriesFromB2(): Promise<Gallery[]> {
     
     result.objects.forEach(obj => {
       if (obj.Key) {
-        // Extract the first directory level after B2_BASE_PATH
-        // e.g. if key is "B2 LuxSync/galleries/2026-01-05 Miku Expo/Ruki/photo.jpg"
-        // we want to extract "2026-01-05 Miku Expo"
+        // Extract the gallery folder name from the path
+        // Path format: B2 LuxSync/2026-01-05 Miku Expo/xymiku/xymikuIMG20251227163910.jpg
         const pathParts = obj.Key.split('/');
-        if (pathParts.length >= 3) { // At least B2_BASE_PATH/gallery/user/image
+        if (pathParts.length >= 3) { // At least basepath/gallery/user/image
           const galleryName = pathParts[1]; // The gallery folder name
           if (galleryName) {
             galleryFolders.add(galleryName);
@@ -86,7 +85,15 @@ export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[
     console.log('B2_BASE_PATH:', process.env.B2_BASE_PATH);
     
     // List all objects in the specific gallery folder
-    const result = await b2Service.listObjects(`${galleryFolder}/`, 1000);
+    // Since galleryFolder is the name like '2026-01-05 Miku Expo', we need to search for it in the path
+    const allObjectsResult = await b2Service.listObjects('', 1000);
+    
+    // Filter objects that belong to the specific gallery
+    const result = {
+      objects: allObjectsResult.objects.filter(obj => obj.Key && obj.Key.includes(`/${galleryFolder}/`)),
+      isTruncated: false,
+      nextContinuationToken: null,
+    };
     
     // Extract photos from the objects
     const photos: Photo[] = [];
@@ -129,7 +136,7 @@ export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[
               }
             }
             
-            const originalUrl = `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${encodeURIComponent(obj.Key)}`;
+            const originalUrl = `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${encodeURIComponent(obj.Key).replace(/%2F/g, '/')}`;
             
             photos.push({
               id: obj.Key, // Using the full key as ID
@@ -162,7 +169,7 @@ function getCoverImageForGallery(objects: any[], galleryName: string): string | 
       const pathParts = obj.Key.split('/');
       if (pathParts.length >= 3 && isImageFile(pathParts[pathParts.length - 1])) {
         // Return the first image found in the gallery as cover
-        return `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${encodeURIComponent(obj.Key)}`;
+        return `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${encodeURIComponent(obj.Key).replace(/%2F/g, '/')}`;
       }
     }
   }
