@@ -158,11 +158,11 @@ export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[
  */
 function getCoverImageForGallery(objects: any[], galleryName: string): string | undefined {
   for (const obj of objects) {
-    if (obj.Key && obj.Key.startsWith(`B2 LuxSync/${galleryName}/`)) {
+    if (obj.Key && obj.Key.includes(`/${galleryName}/`)) {
       const pathParts = obj.Key.split('/');
       if (pathParts.length >= 3 && isImageFile(pathParts[pathParts.length - 1])) {
         // Return the first image found in the gallery as cover
-        return `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${obj.Key}`;
+        return `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${encodeURIComponent(obj.Key)}`;
       }
     }
   }
