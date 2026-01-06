@@ -39,7 +39,6 @@ const MasonryGallery: React.FC<MasonryGalleryProps> = ({ photos, onPhotoClick })
                   width={photo.width || 600}
                   height={photo.height || 800}
                   style={{ objectFit: 'cover' }}
-                  unoptimized={true}
                 />
               </div>
             </div>
