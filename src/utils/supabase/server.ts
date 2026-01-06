@@ -24,6 +24,36 @@ export const createClient = () => {
 export const getGalleries = async () => {
   const supabase = createClient();
   
+  console.log('Attempting to fetch galleries from Supabase...');
+  
+  // First, let's check if the galleries table exists
+  const { data: tableCheck, error: tableError } = await supabase
+    .from('galleries')
+    .select('id')
+    .limit(1);
+    
+  if (tableError) {
+    console.error('Table check failed:', tableError);
+    console.error('Table error details:', {
+      code: tableError.code,
+      message: tableError.message,
+      hint: tableError.hint,
+      details: tableError.details
+    });
+    
+    // Check if it's a schema cache issue
+    if (tableError.code === '42P01' || tableError.message.includes('does not exist')) {
+      console.error('The galleries table does not exist in the database');
+      
+      // Log that we're checking for table existence
+      console.log('Confirming galleries table does not exist in database');
+    }
+    
+    throw tableError;
+  }
+  
+  console.log('Table exists, fetching all galleries...');
+  
   const { data, error } = await supabase
     .from('galleries')
     .select('*')
@@ -34,6 +64,7 @@ export const getGalleries = async () => {
     throw error;
   }
   
+  console.log('Successfully fetched galleries:', data.length);
   return data;
 };
 
@@ -159,6 +190,8 @@ export const getPhotosByUserHandle = async (userHandle: string) => {
 };
 
 export const getPhotosByUserHandleFromB2 = async (userHandle: string) => {
+  console.log('Fetching photos for user handle from B2:', userHandle);
+  
   // This function will fetch photos from B2 storage based on the user handle (subfolder name)
   // This is a fallback for when we don't have the user in the database
   const { getPhotosForGallery } = await import('@/utils/b2/gallery-parser');
@@ -166,27 +199,39 @@ export const getPhotosByUserHandleFromB2 = async (userHandle: string) => {
   // In the B2 structure, user photos are in subfolders named after the user handle
   // So we need to find all galleries that have photos from this user
   const { getGalleriesFromB2 } = await import('@/utils/b2/gallery-parser');
-  const galleries = await getGalleriesFromB2();
   
-  let allUserPhotos: any[] = [];
-  
-  for (const gallery of galleries) {
-    // Get photos for this gallery
-    const photos = await getPhotosForGallery(gallery.folderName);
+  try {
+    const galleries = await getGalleriesFromB2();
+    console.log('Found galleries from B2:', galleries.length);
     
-    // Filter photos that belong to this user handle
-    const userPhotos = photos.filter(photo => {
-      // Extract user handle from the photo path (format: B2_BASE_PATH/gallery/userHandle/image.jpg)
-      const pathParts = photo.b2_file_key.split('/');
-      if (pathParts.length >= 3) {
-        const extractedUserHandle = pathParts[2]; // The user handle is the third part
-        return extractedUserHandle === userHandle;
-      }
-      return false;
-    });
+    let allUserPhotos: any[] = [];
     
-    allUserPhotos = [...allUserPhotos, ...userPhotos];
+    for (const gallery of galleries) {
+      console.log('Processing gallery:', gallery.folder_name);
+      
+      // Get photos for this gallery
+      const photos = await getPhotosForGallery(gallery.folder_name);
+      console.log(`Found ${photos.length} photos in gallery ${gallery.folder_name}`);
+      
+      // Filter photos that belong to this user handle
+      const userPhotos = photos.filter(photo => {
+        // Extract user handle from the photo path (format: B2_BASE_PATH/gallery/userHandle/image.jpg)
+        const pathParts = photo.b2_file_key.split('/');
+        if (pathParts.length >= 3) {
+          const extractedUserHandle = pathParts[2]; // The user handle is the third part
+          return extractedUserHandle === userHandle;
+        }
+        return false;
+      });
+      
+      console.log(`Found ${userPhotos.length} photos for user ${userHandle} in gallery ${gallery.folder_name}`);
+      allUserPhotos = [...allUserPhotos, ...userPhotos];
+    }
+    
+    console.log(`Total user photos found: ${allUserPhotos.length}`);
+    return allUserPhotos;
+  } catch (error) {
+    console.error('Error in getPhotosByUserHandleFromB2:', error);
+    throw error;
   }
-  
-  return allUserPhotos;
 };

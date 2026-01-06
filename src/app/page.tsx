@@ -41,7 +41,34 @@ export default async function Home() {
       />;
     }
   } catch (error: any) {
-    console.error('Error loading home page:', error);
+    console.error('Error loading home page from database:', error);
+    
+    // If database access fails, try to load from B2 storage as a fallback
+    try {
+      console.log('Attempting to load galleries from B2 storage as fallback...');
+      const { getGalleriesFromB2 } = await import('@/utils/b2/gallery-parser');
+      const b2Galleries = await getGalleriesFromB2();
+      
+      if (b2Galleries && b2Galleries.length > 0) {
+        const firstGallery = b2Galleries[0];
+        
+        // Get photos for the first gallery from B2
+        const { getPhotosForGallery } = await import('@/utils/b2/gallery-parser');
+        const photos = await getPhotosForGallery(firstGallery.folder_name);
+        
+        console.log(`Loaded ${photos.length} photos from B2 for gallery ${firstGallery.title}`);
+        
+        return <HomePageClient 
+          initialPhotos={photos} 
+          initialGallery={firstGallery} 
+          initialError={null} 
+        />;
+      }
+    } catch (b2Error: any) {
+      console.error('Error loading from B2 fallback:', b2Error);
+    }
+    
+    // If both database and B2 fail, return error
     return <HomePageClient 
       initialPhotos={[]} 
       initialGallery={null} 
