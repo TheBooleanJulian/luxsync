@@ -89,8 +89,9 @@ export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[
     const allObjectsResult = await b2Service.listObjects('', 1000);
     
     // Filter objects that belong to the specific gallery
+    // Path format in bucket is like: B2 LuxSync/2026-01-05 Miku Expo/xymiku/xymikuIMG20251227163910.jpg
     const result = {
-      objects: allObjectsResult.objects.filter(obj => obj.Key && obj.Key.includes(`/${galleryFolder}/`)),
+      objects: allObjectsResult.objects.filter(obj => obj.Key && obj.Key.includes(`${galleryFolder}/`)),
       isTruncated: false,
       nextContinuationToken: null,
     };
@@ -136,7 +137,7 @@ export async function getPhotosForGallery(galleryFolder: string): Promise<Photo[
               }
             }
             
-            const originalUrl = `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${encodeURIComponent(obj.Key).replace(/%2F/g, '/')}`;
+            const originalUrl = `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${obj.Key}`;
             
             photos.push({
               id: obj.Key, // Using the full key as ID
@@ -169,7 +170,7 @@ function getCoverImageForGallery(objects: any[], galleryName: string): string | 
       const pathParts = obj.Key.split('/');
       if (pathParts.length >= 3 && isImageFile(pathParts[pathParts.length - 1])) {
         // Return the first image found in the gallery as cover
-        return `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${encodeURIComponent(obj.Key).replace(/%2F/g, '/')}`;
+        return `${process.env.B2_PUBLIC_URL}/file/${process.env.B2_BUCKET_NAME}/${obj.Key}`;
       }
     }
   }
