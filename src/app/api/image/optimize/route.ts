@@ -5,7 +5,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const url = searchParams.get('url');
     const width = searchParams.get('width');
-    const height = searchParams.get('height');
     const quality = searchParams.get('quality') || '80';
 
     if (!url) {
@@ -15,24 +14,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // In a real implementation, this would:
-    // 1. Fetch the image from the original URL
-    // 2. Resize it based on the width/height parameters
-    // 3. Optimize it based on the quality parameter
-    // 4. Return the optimized image
+    // For external images, Next.js will handle optimization through the remotePatterns in next.config.js
+    // We'll redirect to the original URL with width and quality parameters if the image service supports it
+    // For B2, we can't add query parameters to the image URL, so we return the original URL
+    // Next.js Image component will handle optimization based on the width prop
     
-    // For now, we'll return a placeholder response that would redirect to an optimized version
-    // In a real implementation, you'd want to use a service like Sharp for image processing
-    
-    // For the purpose of this implementation, we'll return a URL that includes the parameters
-    // A real implementation would process the image server-side
-    const optimizedUrl = `${url}?width=${width || 600}&quality=${quality}`;
-    
-    // For now, just return the original URL since we don't have server-side processing
-    // In a real implementation, you would return the optimized image buffer
-    return Response.json({ 
+    return Response.json({
       optimizedUrl: url,
-      message: 'Image optimization service would be implemented in production'
+      width: width ? parseInt(width) : 600,
+      message: 'Next.js will optimize this image based on the width prop and remotePatterns in next.config.js'
     });
   } catch (error) {
     console.error('Error in image optimization API:', error);
