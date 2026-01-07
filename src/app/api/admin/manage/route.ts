@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
             b2_file_key: targetPath,
             public_url: b2Service.getPublicUrl(targetPath)
           })
-          .ilike('b2_file_key', `%${fileName}`);
+          .eq('b2_file_key', sourcePath);
 
         if (updateError) {
           console.error('Error updating database:', updateError);
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         const { error: deleteError } = await supabase
           .from('photos')
           .delete()
-          .ilike('b2_file_key', `%${sourcePath.split('/').pop()}`);
+          .eq('b2_file_key', sourcePath);
 
         if (deleteError) {
           console.error('Error deleting from database:', deleteError);

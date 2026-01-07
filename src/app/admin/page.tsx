@@ -260,6 +260,33 @@ function ManageTab() {
   const [action, setAction] = useState<'move' | 'rename' | 'delete'>('move');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [showFileBrowser, setShowFileBrowser] = useState(false);
+  const [files, setFiles] = useState<any[]>([]);
+  const [filesLoading, setFilesLoading] = useState(false);
+
+  const loadFiles = async () => {
+    setFilesLoading(true);
+    try {
+      const response = await fetch('/api/admin/list-files');
+      const data = await response.json();
+      
+      if (data.success) {
+        setFiles(data.files);
+      } else {
+        setMessage(data.message || 'Failed to load files');
+      }
+    } catch (error) {
+      setMessage('An error occurred while loading files');
+      console.error(error);
+    } finally {
+      setFilesLoading(false);
+    }
+  };
+
+  const handleSelectFile = (filePath: string) => {
+    setSourcePath(filePath);
+    setShowFileBrowser(false);
+  };
 
   const handleAction = async () => {
     if (!sourcePath) {
@@ -318,17 +345,54 @@ function ManageTab() {
         </select>
       </div>
       
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">
-          Source Path (e.g., "2026-01-08 Test Event/username/photo.jpg")
-        </label>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Source Path
+          </label>
+          <button
+            type="button"
+            onClick={() => {
+              loadFiles();
+              setShowFileBrowser(!showFileBrowser);
+            }}
+            className="text-sm text-blue-400 hover:text-blue-300"
+          >
+            {showFileBrowser ? 'Hide Browser' : 'Show File Browser'}
+          </button>
+        </div>
         <input
           type="text"
           value={sourcePath}
           onChange={(e) => setSourcePath(e.target.value)}
           className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+          placeholder="Enter source path or browse files"
         />
       </div>
+      
+      {showFileBrowser && (
+        <div className="border border-gray-600 rounded-md p-4 bg-gray-700">
+          <h3 className="text-lg font-medium text-white mb-2">Available Files</h3>
+          {filesLoading ? (
+            <p className="text-gray-400">Loading files...</p>
+          ) : files.length > 0 ? (
+            <div className="max-h-60 overflow-y-auto">
+              {files.map((file, index) => (
+                <div 
+                  key={index}
+                  className="p-2 border-b border-gray-600 cursor-pointer hover:bg-gray-600 flex justify-between items-center"
+                  onClick={() => handleSelectFile(file.b2Path)}
+                >
+                  <span className="text-gray-300 truncate max-w-xs">{file.fileName}</span>
+                  <span className="text-xs text-gray-400">{Math.round(file.size / 1024)} KB</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400">No files found</p>
+          )}
+        </div>
+      )}
       
       {action !== 'delete' && (
         <div>
