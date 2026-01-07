@@ -6,12 +6,13 @@ import { Photo } from '@/types/database';
 interface PhotoModalProps {
   photo: Photo | null;
   onClose: () => void;
-  onDownload: (photo: Photo) => void;
+  onDownload: (photo: Photo) => Promise<void>;
 }
 
 const PhotoModal: React.FC<PhotoModalProps> = ({ photo, onClose, onDownload }) => {
   const [loaded, setLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Check if photo is favorited on initial load
   useEffect(() => {
@@ -114,13 +115,30 @@ const PhotoModal: React.FC<PhotoModalProps> = ({ photo, onClose, onDownload }) =
                 </svg>
               </button>
               <button
-                onClick={() => onDownload(photo)}
+                onClick={async () => {
+                  setIsDownloading(true);
+                  await onDownload(photo);
+                  setIsDownloading(false);
+                }}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
+                disabled={isDownloading}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download
+                {isDownloading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Downloading...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download
+                  </>
+                )}
               </button>
             </div>
           </div>
