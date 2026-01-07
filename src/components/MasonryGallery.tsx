@@ -16,7 +16,7 @@ const MasonryGallery: React.FC<MasonryGalleryProps> = ({ photos, onPhotoClick })
         {photos.map((photo) => (
           <div
             key={photo.id}
-            className="cursor-pointer overflow-hidden rounded-lg shadow-lg transition-transform duration-300 hover:scale-[1.02] aspect-[3/4]"
+            className="cursor-pointer overflow-hidden rounded-lg shadow-lg transition-transform duration-300 hover:scale-[1.02] aspect-[2/3]"
             onClick={() => onPhotoClick?.(photo)}
           >
             <div 
