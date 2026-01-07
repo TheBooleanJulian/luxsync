@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: true, // This allows loading images from any external URL without optimization
+    unoptimized: false, // Enable image optimization
     remotePatterns: [
       {
         protocol: 'https',

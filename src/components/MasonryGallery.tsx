@@ -27,8 +27,8 @@ const MasonryGallery: React.FC<MasonryGalleryProps> = ({ photos, onPhotoClick })
                 alt={`Gallery photo ${(photo.b2_file_key || photo.id).split('/').pop()}`}
                 className="h-full w-full object-cover"
                 loading="lazy"
-                width={photo.width ? Math.min(photo.width, 600) : 600}
-                height={photo.height ? Math.min(photo.height, 800) : 800}
+                width={photo.width ? Math.min(photo.width, 400) : 400}
+                height={photo.height ? Math.min(photo.height, 600) : 600}
                 style={{ objectFit: 'cover' }}
                 unoptimized={false}
               />

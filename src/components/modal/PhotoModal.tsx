@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, KeyboardEvent } from 'react';
+import Image from 'next/image';
 import { Photo } from '@/types/database';
 
 interface PhotoModalProps {
@@ -79,12 +80,15 @@ const PhotoModal: React.FC<PhotoModalProps> = ({ photo, onClose, onDownload }) =
               <div className="text-white text-lg">Loading...</div>
             </div>
           )}
-          <img
+          <Image
             src={photo.public_url}
             alt={`Gallery photo ${photo.id}`}
             className={`max-h-[80vh] max-w-full object-contain ${loaded ? 'block' : 'hidden'}`}
             onLoad={() => setLoaded(true)}
             onError={() => setLoaded(true)} // Show the image even if there's an error
+            width={photo.width || 800}
+            height={photo.height || 1200}
+            style={{ objectFit: 'contain' }}
           />
         </div>
 
