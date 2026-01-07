@@ -288,3 +288,84 @@ export const getPhotosByUserHandleFromB2 = async (userHandle: string) => {
     throw error;
   }
 };
+
+export const getGalleriesByUserHandle = async (userHandle: string) => {
+  const supabase = createClient();
+  
+  // First get the user by handle
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('handle', userHandle)
+    .single();
+    
+  if (userError) {
+    console.error('Error fetching user:', userError);
+    throw userError;
+  }
+  
+  // Then get all photos tagged to this user
+  const { data: userPhotos, error: photosError } = await supabase
+    .from('photos')
+    .select('gallery_id')
+    .eq('user_tag_id', user.id)
+    .order('created_at', { ascending: false });
+    
+  if (photosError) {
+    console.error('Error fetching user photos:', photosError);
+    throw photosError;
+  }
+  
+  // Get unique gallery IDs
+  const galleryIds = [...new Set(userPhotos.map(photo => photo.gallery_id))];
+  
+  // Get gallery details for each gallery ID
+  let galleries = [];
+  if (galleryIds.length > 0) {
+    const { data: galleryData, error: galleryError } = await supabase
+      .from('galleries')
+      .select('*')
+      .in('id', galleryIds)
+      .order('event_date', { ascending: false });
+      
+    if (galleryError) {
+      console.error('Error fetching galleries:', galleryError);
+      throw galleryError;
+    }
+    
+    galleries = galleryData;
+  }
+  
+  return galleries;
+};
+
+export const getPhotosByUserHandleAndGallery = async (userHandle: string, galleryId: string) => {
+  const supabase = createClient();
+  
+  // First get the user by handle
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('handle', userHandle)
+    .single();
+    
+  if (userError) {
+    console.error('Error fetching user:', userError);
+    throw userError;
+  }
+  
+  // Then get photos tagged to this user in the specific gallery
+  const { data: photos, error: photosError } = await supabase
+    .from('photos')
+    .select('*')
+    .eq('user_tag_id', user.id)
+    .eq('gallery_id', galleryId)
+    .order('created_at', { ascending: false });
+    
+  if (photosError) {
+    console.error('Error fetching user photos for gallery:', photosError);
+    throw photosError;
+  }
+  
+  return photos;
+};

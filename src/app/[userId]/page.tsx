@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
-import UserGalleryClient from '../UserGalleryClient';
+import UserVanityClient from '../UserVanityClient';
 
-interface UserGalleryPageProps {
+interface UserVanityPageProps {
   params: {
     userId: string;
   };
@@ -12,10 +12,10 @@ export async function generateMetadata({ params }: { params: { userId: string } 
   
   return {
     title: `Photos for ${userId} | LuxSync Gallery`,
-    description: `View photos for user ${userId} on LuxSync`,
+    description: `View galleries and photos for user ${userId} on LuxSync`,
     openGraph: {
       title: `Photos for ${userId}` ,
-      description: `Photos tagged to user ${userId}`,
+      description: `Galleries and photos tagged to user ${userId}`,
       type: 'profile',
       url: `https://luxsync.vercel.app/${userId}`,
       siteName: 'LuxSync',
@@ -23,13 +23,13 @@ export async function generateMetadata({ params }: { params: { userId: string } 
     twitter: {
       card: 'summary',
       title: `Photos for ${userId}`,
-      description: `Photos tagged to user ${userId}`,
+      description: `Galleries and photos tagged to user ${userId}`,
     },
   };
 }
 
-export default async function UserGalleryPage({ params }: UserGalleryPageProps) {
+export default async function UserVanityPage({ params }: UserVanityPageProps) {
   const { userId } = params;
   
-  return <UserGalleryClient userId={userId} />;
+  return <UserVanityClient userId={userId} />;
 }
