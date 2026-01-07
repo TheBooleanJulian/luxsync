@@ -225,11 +225,22 @@ ADMIN_PASSWORD=your_secure_admin_password
 
 ### Server Configuration for Large Files
 
-By default, serverless functions (like those on Vercel) have size limits that may restrict large file uploads (typically 4.5MB on Vercel's free tier). For larger files:
+There are two types of file size limits to be aware of:
+
+#### Deployment Limits
+- Static file deployment: 100MB for Hobby accounts, 1GB for Pro accounts
+- These limits apply when deploying your application code, not when uploading photos through the admin panel
+
+#### Runtime Upload Limits
+- By default, serverless functions (like those on Vercel) have size limits that may restrict large file uploads (typically 4.5MB on Vercel's free tier)
+- These limits apply when using the admin panel to upload photos to B2 storage
+
+For larger runtime uploads:
 
 - **On Vercel**: Consider upgrading your plan or configuring larger function limits
 - **Alternative hosting**: Ensure your hosting provider supports larger request body sizes
 - **File size limits**: The admin panel allows up to 25MB per file with a 50MB total batch limit, but server configuration may impose additional restrictions
+- **Alternative approach**: For very large files, consider using the Backblaze B2 CLI tool or direct upload to B2 storage instead of using the admin panel
 
 ## Open Graph Metadata
 

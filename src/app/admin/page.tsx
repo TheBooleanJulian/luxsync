@@ -234,6 +234,7 @@ function UploadTab() {
         />
         <p className="text-xs text-gray-400 mt-1">Max file size: 25MB per file, 50MB total per batch</p>
         <p className="text-xs text-yellow-400 mt-1">Note: Large uploads may fail on free hosting tiers. Contact admin if uploads fail repeatedly.</p>
+        <p className="text-xs text-blue-400 mt-1">For very large files, consider using B2 CLI or direct upload tools.</p>
       </div>
       
       <button
