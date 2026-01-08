@@ -5,13 +5,13 @@ import MasonryGallery from '@/components/MasonryGallery';
 import PhotoModal from '@/components/modal/PhotoModal';
 import { Photo, Gallery } from '@/types/database';
 
-interface HomePageClientProps {
+interface GalleryPageClientProps {
   initialPhotos: Photo[];
   initialGallery: Gallery | null;
   initialError: string | null;
 }
 
-export default function HomePageClient({ initialPhotos, initialGallery, initialError }: HomePageClientProps) {
+export default function GalleryPageClient({ initialPhotos, initialGallery, initialError }: GalleryPageClientProps) {
   const [photos] = useState<Photo[]>(initialPhotos);
   const [error] = useState<string | null>(initialError);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
@@ -79,10 +79,10 @@ export default function HomePageClient({ initialPhotos, initialGallery, initialE
             <p className="text-gray-500 text-sm mt-1">Gallery ID: {currentGallery.folder_name}</p>
           </>
         )}
-        <div className="mt-4 flex flex-col items-center space-y-3">
+        <div className="mt-4">
           <button
             onClick={handleDownloadGallery}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center mx-auto"
             disabled={isGalleryDownloading}
           >
             {isGalleryDownloading ? (
@@ -102,12 +102,6 @@ export default function HomePageClient({ initialPhotos, initialGallery, initialE
               </>
             )}
           </button>
-          <a 
-            href="/galleries" 
-            className="text-blue-600 hover:text-blue-800 underline"
-          >
-            View All Galleries
-          </a>
         </div>
       </div>
       
