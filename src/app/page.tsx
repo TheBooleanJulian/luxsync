@@ -31,18 +31,15 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleries.map((gallery) => (
-              <div 
+              <a 
                 key={gallery.id} 
-                className="border border-gray-200 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow cursor-pointer bg-white"
-                onClick={() => {
-                  // Redirect to the specific gallery page
-                  window.location.href = `/gallery/${encodeURIComponent(gallery.folder_name)}`;
-                }}
+                href={`/gallery/${encodeURIComponent(gallery.folder_name)}`}
+                className="border border-gray-200 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow block bg-white"
               >
                 <h2 className="text-xl font-semibold mb-2">{gallery.title}</h2>
                 <p className="text-gray-600 mb-1">{gallery.event_date}</p>
                 <p className="text-sm text-gray-500">ID: {gallery.folder_name}</p>
-              </div>
+              </a>
             ))}
           </div>
         </div>
@@ -70,18 +67,15 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {syncedGalleries.map((gallery) => (
-              <div 
+              <a 
                 key={gallery.id} 
-                className="border border-gray-200 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow cursor-pointer bg-white"
-                onClick={() => {
-                  // Redirect to the specific gallery page
-                  window.location.href = `/gallery/${encodeURIComponent(gallery.folder_name)}`;
-                }}
+                href={`/gallery/${encodeURIComponent(gallery.folder_name)}`}
+                className="border border-gray-200 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow block bg-white"
               >
                 <h2 className="text-xl font-semibold mb-2">{gallery.title}</h2>
                 <p className="text-gray-600 mb-1">{gallery.event_date}</p>
                 <p className="text-sm text-gray-500">ID: {gallery.folder_name}</p>
-              </div>
+              </a>
             ))}
           </div>
         </div>
@@ -106,18 +100,15 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {b2Galleries.map((gallery) => (
-              <div 
+              <a 
                 key={gallery.id || gallery.folder_name} 
-                className="border border-gray-200 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow cursor-pointer bg-white"
-                onClick={() => {
-                  // Redirect to the specific gallery page
-                  window.location.href = `/gallery/${encodeURIComponent(gallery.folder_name)}`;
-                }}
+                href={`/gallery/${encodeURIComponent(gallery.folder_name)}`}
+                className="border border-gray-200 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow block bg-white"
               >
                 <h2 className="text-xl font-semibold mb-2">{gallery.title}</h2>
                 <p className="text-gray-600 mb-1">{gallery.event_date}</p>
                 <p className="text-sm text-gray-500">ID: {gallery.folder_name}</p>
-              </div>
+              </a>
             ))}
           </div>
         </div>
