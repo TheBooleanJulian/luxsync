@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
         // Calculate file hash (using a simple approach, in real app use proper hashing)
         const fileHash = await calculateFileHash(buffer);
 
-        // Store metadata in Supabase
-        const supabase = createClient();
+        // Store metadata in Supabase using service role for write operations
+        const supabase = createClient(true); // Use service role for write operations
         
         // First, ensure gallery exists
         const galleryName = folderPath.split('/')[0]; // Extract gallery name from path

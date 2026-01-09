@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     console.log('Starting database sync verification...');
     
     // Get Supabase client
-    const supabase = createClient();
+    const supabase = createClient(); // Use regular client for read operations in GET request
     
     // Fetch all galleries from Supabase
     const { data: dbGalleries, error: galleriesError } = await supabase
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log('Starting forced database sync from B2...');
     
-    const supabase = createClient();
+    const supabase = createClient(true); // Use service role for write operations in POST request
     
     // Fetch all objects from B2
     const b2ListResponse: any = await b2Service.listObjects('B2 LuxSync/');

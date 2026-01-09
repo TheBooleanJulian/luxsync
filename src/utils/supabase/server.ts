@@ -1,9 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 
-export const createClient = () => {
+export const createClient = (useServiceRole: boolean = false) => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = useServiceRole 
+    ? process.env.SUPABASE_SERVICE_ROLE_KEY!
+    : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -103,7 +108,7 @@ export const getGalleryByFolderName = async (folderName: string) => {
 };
 
 export const createGallery = async (galleryData: { title: string; event_date: string; folder_name: string; cover_image_url?: string; access_pin?: string }) => {
-  const supabase = createClient();
+  const supabase = createClient(true); // Use service role for write operations
   
   const { data, error } = await supabase
     .from('galleries')
@@ -120,7 +125,7 @@ export const createGallery = async (galleryData: { title: string; event_date: st
 };
 
 export const createPhoto = async (photoData: { gallery_id: string; user_tag_id?: string; b2_file_key: string; public_url: string; width?: number; height?: number }) => {
-  const supabase = createClient();
+  const supabase = createClient(true); // Use service role for write operations
   
   const { data, error } = await supabase
     .from('photos')
@@ -190,7 +195,7 @@ export const getPhotosByUserHandle = async (userHandle: string) => {
 };
 
 export const deleteGallery = async (galleryId: string) => {
-  const supabase = createClient();
+  const supabase = createClient(true); // Use service role for write operations
   
   const { error } = await supabase
     .from('galleries')
@@ -223,7 +228,7 @@ export const getUserByHandle = async (handle: string) => {
 };
 
 export const createUser = async (userData: { handle: string; display_name?: string; instagram?: string }) => {
-  const supabase = createClient();
+  const supabase = createClient(true); // Use service role for write operations
   
   // Generate a unique ID for the user
   const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
