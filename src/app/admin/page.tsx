@@ -2,6 +2,8 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import FileUploadDropzone from '@/components/admin/FileUploadDropzone';
+import FileThumbnailGrid from '@/components/admin/FileThumbnailGrid';
 
 export default function AdminPage() {
   const [password, setPassword] = useState('');
@@ -132,39 +134,37 @@ function AdminDashboard() {
 }
 
 function UploadTab() {
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [folderPath, setFolderPath] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      // Check total size of files
-      let totalSize = 0;
-      for (let i = 0; i < e.target.files.length; i++) {
-        totalSize += e.target.files[i].size;
-      }
-      
-      // Check if total size exceeds 50MB limit
-      if (totalSize > 50 * 1024 * 1024) {
-        setMessage('Total file size exceeds 50MB limit. Please upload smaller files or fewer files at once.');
+  const handleFilesSelected = (files: File[]) => {
+    // Check total size of files
+    let totalSize = 0;
+    for (let i = 0; i < files.length; i++) {
+      totalSize += files[i].size;
+    }
+    
+    // Check if total size exceeds 50MB limit
+    if (totalSize > 50 * 1024 * 1024) {
+      setMessage('Total file size exceeds 50MB limit. Please upload smaller files or fewer files at once.');
+      return;
+    }
+    
+    // Check individual file sizes
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].size > 25 * 1024 * 1024) { // 25MB per file limit
+        setMessage(`File ${files[i].name} exceeds 25MB limit. Please resize or compress the image.`);
         return;
       }
-      
-      // Check individual file sizes
-      for (let i = 0; i < e.target.files.length; i++) {
-        if (e.target.files[i].size > 25 * 1024 * 1024) { // 25MB per file limit
-          setMessage(`File ${e.target.files[i].name} exceeds 25MB limit. Please resize or compress the image.`);
-          return;
-        }
-      }
-      
-      setFiles(e.target.files);
     }
+    
+    setSelectedFiles(files);
   };
 
   const handleUpload = async () => {
-    if (!files || files.length === 0) {
+    if (!selectedFiles || selectedFiles.length === 0) {
       setMessage('Please select files to upload');
       return;
     }
@@ -173,8 +173,8 @@ function UploadTab() {
     setMessage('');
 
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append('files', selectedFiles[i]);
     }
     formData.append('folderPath', folderPath);
 
@@ -188,7 +188,7 @@ function UploadTab() {
 
       if (response.ok) {
         setMessage(`${result.message}. ${result.processedFiles} files processed.`);
-        setFiles(null);
+        setSelectedFiles([]);
       } else {
         // Check for specific error codes
         if (response.status === 413) {
@@ -225,27 +225,14 @@ function UploadTab() {
         />
       </div>
       
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">
-          Select Files to Upload
-        </label>
-        <input
-          type="file"
-          multiple
-          onChange={handleFileChange}
-          className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
-        />
-        <p className="text-xs text-gray-400 mt-1">Max file size: 25MB per file, 50MB total per batch</p>
-        <p className="text-xs text-yellow-400 mt-1">Note: Large uploads may fail on free hosting tiers. Contact admin if uploads fail repeatedly.</p>
-        <p className="text-xs text-blue-400 mt-1">For very large files, consider using B2 CLI or direct upload tools.</p>
-      </div>
+      <FileUploadDropzone onFilesSelected={handleFilesSelected} folderPath={folderPath} />
       
       <button
         onClick={handleUpload}
-        disabled={isLoading}
+        disabled={isLoading || selectedFiles.length === 0}
         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
       >
-        {isLoading ? 'Uploading...' : 'Upload Files'}
+        {isLoading ? 'Uploading...' : `Upload ${selectedFiles.length} Files`}
       </button>
       
       {message && (
@@ -264,36 +251,17 @@ function ManageTab() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [showFileBrowser, setShowFileBrowser] = useState(false);
-  const [files, setFiles] = useState<any[]>([]);
-  const [filesLoading, setFilesLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<any>(null);
 
-  const loadFiles = async () => {
-    setFilesLoading(true);
-    try {
-      const response = await fetch('/api/admin/list-files');
-      const data = await response.json();
-      
-      if (data.success) {
-        setFiles(data.files);
-      } else {
-        setMessage(data.message || 'Failed to load files');
-      }
-    } catch (error) {
-      setMessage('An error occurred while loading files');
-      console.error(error);
-    } finally {
-      setFilesLoading(false);
-    }
-  };
-
-  const handleSelectFile = (filePath: string) => {
-    setSourcePath(filePath);
+  const handleSelectFile = (file: any) => {
+    setSourcePath(file.b2Path);
+    setSelectedFile(file);
     setShowFileBrowser(false);
   };
 
   const handleAction = async () => {
     if (!sourcePath) {
-      setMessage('Please enter a source path');
+      setMessage('Please select a source file');
       return;
     }
 
@@ -320,6 +288,9 @@ function ManageTab() {
 
       if (response.ok) {
         setMessage(result.message);
+        // Clear selection after successful operation
+        setSelectedFile(null);
+        setSourcePath('');
       } else {
         setMessage(result.message || 'Action failed');
       }
@@ -351,14 +322,11 @@ function ManageTab() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-300 mb-1">
-            Source Path
+            Source File
           </label>
           <button
             type="button"
-            onClick={() => {
-              loadFiles();
-              setShowFileBrowser(!showFileBrowser);
-            }}
+            onClick={() => setShowFileBrowser(!showFileBrowser)}
             className="text-sm text-blue-400 hover:text-blue-300"
           >
             {showFileBrowser ? 'Hide Browser' : 'Show File Browser'}
@@ -369,31 +337,41 @@ function ManageTab() {
           value={sourcePath}
           onChange={(e) => setSourcePath(e.target.value)}
           className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
-          placeholder="Enter source path or browse files"
+          placeholder="Select a file from the browser below"
+          readOnly
         />
       </div>
       
-      {showFileBrowser && (
+      {showFileBrowser ? (
         <div className="border border-gray-600 rounded-md p-4 bg-gray-700">
           <h3 className="text-lg font-medium text-white mb-2">Available Files</h3>
-          {filesLoading ? (
-            <p className="text-gray-400">Loading files...</p>
-          ) : files.length > 0 ? (
-            <div className="max-h-60 overflow-y-auto">
-              {files.map((file, index) => (
-                <div 
-                  key={index}
-                  className="p-2 border-b border-gray-600 cursor-pointer hover:bg-gray-600 flex justify-between items-center"
-                  onClick={() => handleSelectFile(file.b2Path)}
-                >
-                  <span className="text-gray-300 truncate max-w-xs">{file.fileName}</span>
-                  <span className="text-xs text-gray-400">{Math.round(file.size / 1024)} KB</span>
-                </div>
-              ))}
+          <FileThumbnailGrid 
+            onSelectFile={handleSelectFile}
+            selectedFile={selectedFile}
+          />
+        </div>
+      ) : selectedFile && (
+        <div className="border border-gray-600 rounded-md p-4 bg-gray-700">
+          <h3 className="text-lg font-medium text-white mb-2">Selected File</h3>
+          <div className="flex items-center space-x-4">
+            {selectedFile.type === 'image' ? (
+              <img 
+                src={selectedFile.url || `/api/admin/download/${encodeURIComponent(selectedFile.b2Path)}`}
+                alt={selectedFile.fileName}
+                className="w-16 h-16 object-cover rounded border border-gray-500"
+              />
+            ) : (
+              <div className="w-16 h-16 flex items-center justify-center bg-gray-600 rounded border border-gray-500">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+            )}
+            <div>
+              <p className="text-gray-300 font-medium">{selectedFile.fileName}</p>
+              <p className="text-sm text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
             </div>
-          ) : (
-            <p className="text-gray-400">No files found</p>
-          )}
+          </div>
         </div>
       )}
       
@@ -407,13 +385,14 @@ function ManageTab() {
             value={targetPath}
             onChange={(e) => setTargetPath(e.target.value)}
             className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+            placeholder="Enter new file path"
           />
         </div>
       )}
       
       <button
         onClick={handleAction}
-        disabled={isLoading}
+        disabled={isLoading || !sourcePath}
         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
       >
         {isLoading ? 'Processing...' : action.charAt(0).toUpperCase() + action.slice(1)}

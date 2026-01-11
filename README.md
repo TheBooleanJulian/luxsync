@@ -29,8 +29,16 @@ To properly connect your LuxSync application to Supabase:
 
 1. **Environment Variables**:
    - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL (e.g., `https://xxxxxx.supabase.co`)
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
-   - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase service role key (for server-side operations)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key (for client-side reads)
+   - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase service role key (for server-side write operations)
+
+2. **Key Usage**:
+   - Anonymous key: Used for client-side read operations and server-side read operations
+   - Service role key: Used for server-side write operations (inserts, updates, deletes)
+
+3. **Permissions**:
+   - The service role key bypasses Row Level Security (RLS) and has full database access
+   - This is required for server-side operations like uploading files and writing metadata
 
 2. **Database Tables** (automatically created by migrations):
    - `users`: id, handle, display_name, instagram, created_at
@@ -115,6 +123,12 @@ If you notice that the database remains empty after uploading files to B2:
    - Ensure all required Supabase environment variables are set correctly
    - Check that your service role key has proper permissions
    - Verify your Supabase project URL is correct
+
+2. **Check Database Write Permissions**:
+   - Ensure `SUPABASE_SERVICE_ROLE_KEY` is properly configured
+   - The service role key is required for write operations (uploads, inserts)
+   - The anonymous key is used for read-only operations
+   - If database remains empty after uploads, verify the service role key has write permissions
 
 2. **Check the Database Debug Page** (`/admin/db-debug`):
    - Navigate to the admin panel

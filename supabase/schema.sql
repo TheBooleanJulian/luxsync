@@ -8,16 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Insert default users if they don't exist (for testing purposes)
 INSERT INTO users (id, handle, display_name, instagram) 
-SELECT 'user-1', 'xymiku', 'Xy Miku', '@xymiku' 
+SELECT 'user-1', 'xymiku', 'xymiku', '@xymiku' 
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE handle = 'xymiku');
-
-INSERT INTO users (id, handle, display_name) 
-SELECT 'user-2', 'test', 'Test' 
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE handle = 'test');
-
-INSERT INTO users (id, handle, display_name) 
-SELECT 'user-3', 'ruki', 'Ruki' 
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE handle = 'ruki');
 
 -- Create galleries table
 CREATE TABLE IF NOT EXISTS galleries (
