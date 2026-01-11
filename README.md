@@ -6,6 +6,7 @@ LuxSync is a secure photo gallery platform that seamlessly integrates Backblaze 
 
 - Password-protected admin panel for file management
 - Secure file upload, move, rename, and delete operations
+- Customizable gallery titles (e.g., "Ruki shoots by xymiku" instead of "LuxSync Gallery")
 - Automated metadata extraction and database synchronization
 - Human-friendly file browsing interface
 - Gallery navigation system with clickable tabs
@@ -356,6 +357,7 @@ LuxSync includes a password-protected admin panel for managing your galleries:
 - **URL**: `/admin`
 - **Features**: Upload, move, rename, and delete files/folders in B2 LuxSync
 - **Metadata Management**: Write important metadata to Supabase including filename, dimensions, and hash IDs
+- **Custom Gallery Titles**: Edit gallery titles that appear in the public interface (e.g., "Ruki shoots by xymiku" instead of "LuxSync Gallery")
 - **File Hashing**: Automatically hashes filenames when uploading to B2, which are then recorded in Supabase for secure file retrieval
 
 ### Setup Admin Password
@@ -373,6 +375,7 @@ ADMIN_PASSWORD=your_secure_admin_password
 3. Use the dashboard to manage your galleries:
    - **Upload Tab**: Upload files to specific folder paths
    - **Manage Tab**: Move, rename, or delete existing files/folders
+   - **Edit Titles Tab**: Customize gallery titles that appear in the public interface
    - **Metadata Tab**: Sync all metadata from B2 to Supabase
 
 ### Server Configuration for Large Files
