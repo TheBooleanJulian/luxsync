@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import FileUploadDropzone from '@/components/admin/FileUploadDropzone';
 import FileThumbnailGrid from '@/components/admin/FileThumbnailGrid';
@@ -105,7 +105,7 @@ function AdminDashboard() {
 
           <div className="border-b border-gray-700 mb-6">
             <nav className="flex space-x-8">
-              {['upload', 'manage', 'metadata', 'debug', 'logs', 'sync'].map((tab) => (
+              {['upload', 'manage', 'titles', 'metadata', 'debug', 'logs', 'sync'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -115,7 +115,7 @@ function AdminDashboard() {
                       : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-500'
                   }`}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab === 'titles' ? 'Edit Titles' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </button>
               ))}
             </nav>
@@ -123,6 +123,7 @@ function AdminDashboard() {
 
           {activeTab === 'upload' && <UploadTab />}
           {activeTab === 'manage' && <ManageTab />}
+          {activeTab === 'titles' && <TitlesTab />}
           {activeTab === 'metadata' && <MetadataTab />}
           {activeTab === 'debug' && <DebugTab />}
           {activeTab === 'logs' && <LogsTab />}
@@ -535,6 +536,135 @@ function MetadataTab() {
       
       {message && (
         <div className={`p-3 rounded-md ${message.includes('failed') ? 'bg-red-800 text-red-200' : 'bg-blue-800 text-blue-200'}`}>
+          {message}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TitlesTab() {
+  const [galleries, setGalleries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    loadGalleries();
+  }, []);
+
+  const loadGalleries = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/galleries');
+      const data = await response.json();
+      
+      if (data.success) {
+        setGalleries(data.galleries);
+      } else {
+        setMessage(data.message || 'Failed to load galleries');
+      }
+    } catch (error) {
+      setMessage('An error occurred while loading galleries');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateTitle = async (galleryId: string, newTitle: string) => {
+    if (!newTitle.trim()) {
+      setMessage('Title cannot be empty');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/update-title', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ galleryId, newTitle }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setMessage(result.message);
+        // Refresh the galleries list
+        loadGalleries();
+      } else {
+        setMessage(result.message || 'Failed to update title');
+      }
+    } catch (error) {
+      setMessage('An error occurred while updating the title');
+      console.error(error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-blue-900 border border-blue-700 rounded-md p-4">
+        <p className="text-blue-200">
+          Edit gallery titles that appear in the public interface. Change "LuxSync Gallery" to custom titles like "Ruki shoots by xymiku".
+        </p>
+      </div>
+      
+      <div className="space-y-4">
+        {galleries.map((gallery) => (
+          <div key={gallery.id} className="border border-gray-600 rounded-md p-4 bg-gray-800">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Current Title: <span className="font-semibold">{gallery.title}</span>
+                </label>
+                <div className="text-xs text-gray-400 mb-2">
+                  Folder: {gallery.folder_name} | ID: {gallery.id}
+                </div>
+                <input
+                  type="text"
+                  defaultValue={gallery.title}
+                  placeholder="Enter new gallery title"
+                  className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const target = e.target as HTMLInputElement;
+                      handleUpdateTitle(gallery.id, target.value);
+                    }
+                  }}
+                  id={`title-input-${gallery.id}`}
+                />
+              </div>
+              <button
+                onClick={() => {
+                  const input = document.getElementById(`title-input-${gallery.id}`) as HTMLInputElement;
+                  if (input) {
+                    handleUpdateTitle(gallery.id, input.value);
+                  }
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 self-start sm:self-auto"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {galleries.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">No galleries found</p>
+        </div>
+      )}
+      
+      {message && (
+        <div className={`p-3 rounded-md ${message.includes('failed') || message.includes('error') ? 'bg-red-800 text-red-200' : 'bg-green-800 text-green-200'}`}>
           {message}
         </div>
       )}
